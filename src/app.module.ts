@@ -1,5 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
-import { APP_GUARD, APP_FILTER } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
@@ -15,9 +15,24 @@ import { RequireJwtMiddleware } from './common/middleware/require-jwt.middleware
 import { ConfigModule } from './config/config.module';
 import { PoolsModule } from './pools/pools.module';
 import { WebhookBodyMiddleware } from './auth/middleware/webhook-body.middleware';
+import { PricesModule } from './prices/prices.module';
+import { InvoicesModule } from './invoices/invoices.module';
 
 @Module({
-  imports: [PrismaModule, HealthModule, RiskModule, AuthModule, AnalyticsModule, SwapModule, TokensModule, OgModule, ConfigModule, PoolsModule, PricesModule],
+  imports: [
+    PrismaModule,
+    HealthModule,
+    RiskModule,
+    AuthModule,
+    AnalyticsModule,
+    SwapModule,
+    TokensModule,
+    OgModule,
+    ConfigModule,
+    PoolsModule,
+    PricesModule,
+    InvoicesModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

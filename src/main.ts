@@ -2,28 +2,38 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { IndexerJob } from './jobs/indexer';
 import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 
-// Standalone config must use require
-const redis = require('../config/redis');
+// Redis is optional — gracefully fall back to in-memory limiting if unavailable
+let redis: any = null;
+try {
+  redis = require('../config/redis');
+} catch {
+  // Redis not configured; rate-limiting will use in-memory store
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // Security: Disable X-Powered-By header to hide Express.js stack
-  app.disable('x-powered-by');
+  app.getHttpAdapter().getInstance().disable('x-powered-by');
   
-  // Global Rate Limiting (Redis-backed for horizontal scaling)
+  // Global Rate Limiting (Redis-backed when available, in-memory fallback)
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       max: 100, // Limit each IP to 100 requests per windowMs
       standardHeaders: true,
       legacyHeaders: false,
-      store: new RedisStore({
-        sendCommand: (...args) => redis.call(...args),
-      }),
+      ...(redis
+        ? {
+            store: new RedisStore({
+              sendCommand: (...args: string[]) => redis.call(...args),
+            }),
+          }
+        : {}),
       message: 'Too many requests from this IP, please try again after 15 minutes',
     }),
   );
@@ -34,9 +44,13 @@ async function bootstrap() {
     max: 50, // Limit each IP to 50 requests per minute
     standardHeaders: true,
     legacyHeaders: false,
-    store: new RedisStore({
-      sendCommand: (...args) => redis.call(...args),
-    }),
+    ...(redis
+      ? {
+          store: new RedisStore({
+            sendCommand: (...args: string[]) => redis.call(...args),
+          }),
+        }
+      : {}),
     message: 'Too many webhook requests from this IP, please try again after 1 minute',
   });
   
@@ -74,8 +88,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
-  console.log('Application is running on: http://localhost:3000');
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
   
   // Initialize background jobs
   new IndexerJob();

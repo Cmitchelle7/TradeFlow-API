@@ -1,17 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Horizon, Server } from '@stellar/stellar-sdk';
+import { Horizon } from '@stellar/stellar-sdk';
 
 @Injectable()
 export class TokensService {
   private readonly logger = new Logger(TokensService.name);
-  private readonly server: Server;
+  private readonly server: Horizon.Server;
   private cachedAssets: any[] | null = null;
   private cacheTimestamp: number = 0;
   private readonly CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     // Connect to Stellar Horizon Testnet
-    this.server = new Server('https://horizon-testnet.stellar.org');
+    this.server = new Horizon.Server('https://horizon-testnet.stellar.org');
   }
 
   async searchTokens(searchQuery: string): Promise<{

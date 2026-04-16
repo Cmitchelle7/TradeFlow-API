@@ -15,9 +15,14 @@ let AuthService = class AuthService {
     constructor() {
         this.jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
         this.jwtExpiration = '1h';
+        this.adminExpiration = '24h';
+        this.adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
     }
     generateNonce() {
         return crypto.randomBytes(16).toString('hex');
+    }
+    async verifyAdminPassword(password) {
+        return password === this.adminPassword;
     }
     async verifySignature(publicKey, signature, nonce) {
         try {
@@ -40,6 +45,15 @@ let AuthService = class AuthService {
         };
         return jwt.sign(payload, this.jwtSecret, {
             expiresIn: this.jwtExpiration,
+        });
+    }
+    generateAdminJWT() {
+        const payload = {
+            role: 'admin',
+            iat: Math.floor(Date.now() / 1000),
+        };
+        return jwt.sign(payload, this.jwtSecret, {
+            expiresIn: this.adminExpiration,
         });
     }
     verifyJWT(token) {

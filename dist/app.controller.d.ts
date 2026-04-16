@@ -6,4 +6,5 @@ export declare class AppController {
     constructor(appService: AppService);
     getInvoices(): InvoiceDto[];
     createInvoice(createInvoiceDto: CreateInvoiceDto): InvoiceDto;
+    testError(): never;
 }

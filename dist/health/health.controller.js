@@ -45,6 +45,32 @@ let HealthController = class HealthController {
             }, common_1.HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
+    async systemStatus() {
+        try {
+            const uptime = process.uptime();
+            return {
+                operational: 'operational',
+                uptime: Math.floor(uptime),
+                services: {
+                    database: 'connected',
+                    stellar_rpc: 'connected'
+                },
+                timestamp: new Date().toISOString()
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException({
+                operational: 'degraded',
+                uptime: Math.floor(process.uptime()),
+                services: {
+                    database: 'error',
+                    stellar_rpc: 'error'
+                },
+                timestamp: new Date().toISOString(),
+                error: 'System status check failed'
+            }, common_1.HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
 };
 exports.HealthController = HealthController;
 __decorate([
@@ -53,6 +79,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], HealthController.prototype, "healthCheck", null);
+__decorate([
+    (0, common_1.Get)('api/v1/status'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], HealthController.prototype, "systemStatus", null);
 exports.HealthController = HealthController = __decorate([
     (0, common_1.Controller)(),
     __param(0, (0, common_1.Inject)('DATA_SOURCE')),

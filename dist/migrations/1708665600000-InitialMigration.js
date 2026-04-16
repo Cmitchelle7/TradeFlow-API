@@ -107,13 +107,13 @@ class InitialMigration1708665600000 {
                 },
             ],
         }), true);
-        await queryRunner.createForeignKey('invoices', {
+        await queryRunner.createForeignKey('invoices', new typeorm_1.TableForeignKey({
             columnNames: ['userId'],
             referencedTableName: 'users',
             referencedColumnNames: ['id'],
             onDelete: 'SET NULL',
-        });
-        await queryRunner.createIndex('invoices', new typeorm_1.Index('IDX_INVOICE_STATUS', ['status']));
+        }));
+        await queryRunner.createIndex('invoices', new typeorm_1.TableIndex({ name: 'IDX_INVOICE_STATUS', columnNames: ['status'] }));
     }
     async down(queryRunner) {
         await queryRunner.dropTable('invoices');

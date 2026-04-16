@@ -9,14 +9,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_controller_1 = require("./auth.controller");
+const admin_controller_1 = require("./admin.controller");
+const webhook_controller_1 = require("./webhook.controller");
 const auth_service_1 = require("./auth.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        controllers: [auth_controller_1.AuthController],
+        controllers: [auth_controller_1.AuthController, admin_controller_1.AdminController, webhook_controller_1.WebhookController],
         providers: [auth_service_1.AuthService],
+        exports: [auth_service_1.AuthService],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

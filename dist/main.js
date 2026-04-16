@@ -2,20 +2,61 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const common_1 = require("@nestjs/common");
-const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
+const app_module_1 = require("./app.module");
+const indexer_1 = require("./jobs/indexer");
+const express_rate_limit_1 = require("express-rate-limit");
+const rate_limit_redis_1 = require("rate-limit-redis");
+let redis = null;
+try {
+    redis = require('../config/redis');
+}
+catch (_a) {
+}
 async function bootstrap() {
+    var _a;
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    app.enableCors();
+    app.getHttpAdapter().getInstance().disable('x-powered-by');
+    app.use((0, express_rate_limit_1.default)(Object.assign(Object.assign({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }, (redis
+        ? {
+            store: new rate_limit_redis_1.default({
+                sendCommand: (...args) => redis.call(...args),
+            }),
+        }
+        : {})), { message: 'Too many requests from this IP, please try again after 15 minutes' })));
+    const webhookLimiter = (0, express_rate_limit_1.default)(Object.assign(Object.assign({ windowMs: 60 * 1000, max: 50, standardHeaders: true, legacyHeaders: false }, (redis
+        ? {
+            store: new rate_limit_redis_1.default({
+                sendCommand: (...args) => redis.call(...args),
+            }),
+        }
+        : {})), { message: 'Too many webhook requests from this IP, please try again after 1 minute' }));
+    app.use('/api/v1/webhooks/stellar', webhookLimiter);
+    const requiredEnvVars = ['PORT', 'NODE_ENV', 'ADMIN_API_KEY', 'WEBHOOK_SECRET'];
+    const missingVars = requiredEnvVars.filter(key => !process.env[key]);
+    if (missingVars.length > 0) {
+        missingVars.forEach(key => {
+            console.error(`❌ CRITICAL: Missing required environment variable: ${key}`);
+        });
+        console.error('🛑 Server cannot start due to missing configuration. Please check your .env file.');
+        process.exit(1);
+    }
+    app.enableCors({
+        origin: true,
+        credentials: true,
+    });
     app.useGlobalPipes(new common_1.ValidationPipe());
     const config = new swagger_1.DocumentBuilder()
         .setTitle('TradeFlow API')
-        .setDescription('API documentation for the TradeFlow application')
+        .setDescription('TradeFlow API documentation')
         .setVersion('1.0')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
-    swagger_1.SwaggerModule.setup('api/docs', app, document);
-    await app.listen(3000);
+    swagger_1.SwaggerModule.setup('api', app, document);
+    const port = (_a = process.env.PORT) !== null && _a !== void 0 ? _a : 3000;
+    await app.listen(port);
+    console.log(`Application is running on: http://localhost:${port}`);
+    new indexer_1.IndexerJob();
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

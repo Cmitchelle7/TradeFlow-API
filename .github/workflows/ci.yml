@@ -1,18 +1,29 @@
 name: API CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: 'npm'
+
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
+
       - name: Build Application
         run: npm run build
+
+      - name: Run Tests
+        run: npm test

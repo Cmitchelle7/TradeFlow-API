@@ -7,4 +7,13 @@ export declare class HealthController {
         database: string;
         timestamp: string;
     }>;
+    systemStatus(): Promise<{
+        operational: string;
+        uptime: number;
+        services: {
+            database: string;
+            stellar_rpc: string;
+        };
+        timestamp: string;
+    }>;
 }
