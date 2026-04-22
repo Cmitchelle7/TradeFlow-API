@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 
-const cache = require('../../../utils/cache');
+const cache = require('../../utils/cache');
 
 const CACHE_KEY = 'prices:all';
 

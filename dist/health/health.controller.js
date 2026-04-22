@@ -8,68 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HealthController = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("typeorm");
+const health_service_1 = require("./health.service");
 let HealthController = class HealthController {
-    constructor(dataSource) {
-        this.dataSource = dataSource;
+    constructor(healthService) {
+        this.healthService = healthService;
     }
-    async healthCheck() {
-        try {
-            const isConnected = this.dataSource.isInitialized;
-            if (isConnected) {
-                return {
-                    status: 'ok',
-                    database: 'up',
-                    timestamp: new Date().toISOString(),
-                };
-            }
-            else {
-                throw new common_1.HttpException({
-                    status: 'error',
-                    database: 'down',
-                    timestamp: new Date().toISOString(),
-                }, common_1.HttpStatus.SERVICE_UNAVAILABLE);
-            }
-        }
-        catch (error) {
-            throw new common_1.HttpException({
-                status: 'error',
-                database: 'down',
-                timestamp: new Date().toISOString(),
-            }, common_1.HttpStatus.SERVICE_UNAVAILABLE);
-        }
-    }
-    async systemStatus() {
-        try {
-            const uptime = process.uptime();
-            return {
-                operational: 'operational',
-                uptime: Math.floor(uptime),
-                services: {
-                    database: 'connected',
-                    stellar_rpc: 'connected'
-                },
-                timestamp: new Date().toISOString()
-            };
-        }
-        catch (error) {
-            throw new common_1.HttpException({
-                operational: 'degraded',
-                uptime: Math.floor(process.uptime()),
-                services: {
-                    database: 'error',
-                    stellar_rpc: 'error'
-                },
-                timestamp: new Date().toISOString(),
-                error: 'System status check failed'
-            }, common_1.HttpStatus.SERVICE_UNAVAILABLE);
-        }
+    async getHealth() {
+        return this.healthService.getProtocolHealth();
     }
 };
 exports.HealthController = HealthController;
@@ -78,16 +26,9 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], HealthController.prototype, "healthCheck", null);
-__decorate([
-    (0, common_1.Get)('api/v1/status'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], HealthController.prototype, "systemStatus", null);
+], HealthController.prototype, "getHealth", null);
 exports.HealthController = HealthController = __decorate([
-    (0, common_1.Controller)(),
-    __param(0, (0, common_1.Inject)('DATA_SOURCE')),
-    __metadata("design:paramtypes", [typeorm_1.DataSource])
+    (0, common_1.Controller)('api/v1/protocol'),
+    __metadata("design:paramtypes", [health_service_1.HealthService])
 ], HealthController);
 //# sourceMappingURL=health.controller.js.map
