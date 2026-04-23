@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+﻿import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -12,6 +12,7 @@ import { TokensModule } from './tokens/tokens.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { OgModule } from './og/og.module';
 import { RequireJwtMiddleware } from './common/middleware/require-jwt.middleware';
+import { TimeoutMiddleware } from './common/middleware/timeout.middleware';
 import { ConfigModule } from './config/config.module';
 import { PoolsModule } from './pools/pools.module';
 import { WebhookBodyMiddleware } from './auth/middleware/webhook-body.middleware';
@@ -44,6 +45,11 @@ import { InvoicesModule } from './invoices/invoices.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    // Apply global request timeout to all routes
+    consumer
+      .apply(TimeoutMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+
     // Apply webhook body middleware FIRST to capture raw body before JSON parsing
     consumer
       .apply(WebhookBodyMiddleware)
@@ -56,7 +62,7 @@ export class AppModule implements NestModule {
       .apply(RequireJwtMiddleware)
       .forRoutes(
         { path: 'api/v1/webhook/soroban', method: RequestMethod.POST },
-        { path: 'invoices', method: RequestMethod.POST }, // Database-mutating in AppController
+        { path: 'invoices', method: RequestMethod.POST },
       );
   }
 }
