@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 
 export interface VolumeData {
   date: string;
@@ -128,7 +128,6 @@ export class AnalyticsService {
 
     if (poolId) {
       providers = providers.filter((p) => p.poolId === poolId);
-      // Re-rank after filtering
       providers = providers.map((p, index) => ({ ...p, rank: index + 1 }));
     }
 
