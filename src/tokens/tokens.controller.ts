@@ -1,6 +1,8 @@
 import { Controller, Get, Query, HttpException, HttpStatus, Res, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @ApiTags('Tokens')
 @Controller('api/v1/tokens')
@@ -87,6 +89,64 @@ export class TokensController {
       searchQuery: searchQuery,
       timestamp: new Date().toISOString()
     };
+  }
+
+  @Get(':symbol/metadata')
+  @ApiOperation({ summary: 'Get token metadata by symbol', description: 'Retrieve detailed metadata for a specific token by its symbol (e.g., XLM, USDC, AQUA)' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Token metadata retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        symbol: { type: 'string', example: 'XLM' },
+        name: { type: 'string', example: 'Stellar Lumens' },
+        description: { type: 'string' },
+        decimals: { type: 'number' },
+        issuer: { type: 'string' },
+        logo: { type: 'string' }
+      }
+    }
+  })
+  @ApiResponse({ status: 404, description: 'Token metadata not found for the provided symbol' })
+  getTokenMetadata(@Param('symbol') symbol: string) {
+    try {
+      // Read the tokenMetadata.json file
+      const metadataPath = path.join(__dirname, '../../data/tokenMetadata.json');
+      const metadataContent = fs.readFileSync(metadataPath, 'utf-8');
+      const tokenMetadata = JSON.parse(metadataContent);
+
+      // Search for the token by symbol (case-insensitive)
+      const token = tokenMetadata.find(
+        (t: any) => t.symbol.toLowerCase() === symbol.toLowerCase()
+      );
+
+      if (!token) {
+        throw new HttpException(
+          {
+            statusCode: HttpStatus.NOT_FOUND,
+            message: `Token metadata not found for symbol: ${symbol}`,
+            error: 'Not Found'
+          },
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      return token;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Error reading token metadata',
+          error: 'Internal Server Error'
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Get('verify/:address')

@@ -1,0 +1,26 @@
+[
+  {
+    "symbol": "XLM",
+    "name": "Stellar Lumens",
+    "description": "The native cryptocurrency of the Stellar network. Stellar Lumens are used to facilitate transactions and maintain the network.",
+    "decimals": 7,
+    "issuer": "native",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Stellar_Consensus_Protocol.png/220px-Stellar_Consensus_Protocol.png"
+  },
+  {
+    "symbol": "USDC",
+    "name": "USD Coin",
+    "description": "USDC is a fully collateralized US Dollar stablecoin. USDC is the bridge between dollars and crypto, making crypto more usable in everyday transactions.",
+    "decimals": 6,
+    "issuer": "GBBD47F6L3WRUIRDRN4Q3GUMF3VUEQBQO4FSKJ3DFOZQY2E4PWSJD3HU",
+    "logo": "https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+  },
+  {
+    "symbol": "AQUA",
+    "name": "Aquarius",
+    "description": "AQUA is the governance and reward token for the Aquarius decentralized exchange protocol built on Stellar.",
+    "decimals": 7,
+    "issuer": "GBNZILZCDQMWSYC4YFRU6TCYHLX7XCCDKVWYREPRAP5G津EJGHZPXU",
+    "logo": "https://cryptologos.cc/logos/aquarius-aqua-logo.png"
+  }
+]
