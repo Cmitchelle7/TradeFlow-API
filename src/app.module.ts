@@ -18,6 +18,7 @@ import { PoolsModule } from './pools/pools.module';
 import { WebhookBodyMiddleware } from './auth/middleware/webhook-body.middleware';
 import { PricesModule } from './prices/prices.module';
 import { InvoicesModule } from './invoices/invoices.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { InvoicesModule } from './invoices/invoices.module';
     PoolsModule,
     PricesModule,
     InvoicesModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [
