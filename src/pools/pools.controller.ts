@@ -3,11 +3,6 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApyHistoryPoint, generateMockApyHistory } from './apy-history.helper';
 import { PoolIdParamDto } from './dto/pool-id-param.dto';
 
-type ApyHistoryResponse = {
-  status: 'success';
-  data: ApyHistoryPoint[];
-};
-
 @ApiTags('pools')
 @Controller('api/v1/pools')
 export class PoolsController {
@@ -18,28 +13,11 @@ export class PoolsController {
   @ApiResponse({
     status: 200,
     description: 'APY history retrieved successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        status: { type: 'string', example: 'success' },
-        data: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              date: { type: 'string', example: '2026-03-29' },
-              apyPercentage: { type: 'number', example: 9.87 },
-            },
-          },
-        },
-      },
-    },
+    type: ApyHistoryPoint,
+    isArray: true,
   })
-  getApyHistory(@Param() params: PoolIdParamDto): ApyHistoryResponse {
-    return {
-      status: 'success',
-      data: generateMockApyHistory(params.poolId),
-    };
+  getApyHistory(@Param() params: PoolIdParamDto): ApyHistoryPoint[] {
+    return generateMockApyHistory(params.poolId);
   }
 }
 
