@@ -1,5 +1,10 @@
-export interface ApyHistoryPoint {
+import { ApiProperty } from '@nestjs/swagger';
+
+export class ApyHistoryPoint {
+  @ApiProperty({ example: '2026-04-17' })
   date: string; // YYYY-MM-DD
+
+  @ApiProperty({ example: 12.35 })
   apyPercentage: number;
 }
 
@@ -36,7 +41,7 @@ function roundTo(value: number, decimals: number): number {
 
 /**
  * Generates 7 days of deterministic mock APY history.
- * Base 10% with ±2% daily fluctuation, seeded by poolId + date.
+ * Base 12.5% with ±0.5% to ±1.5% daily fluctuation, seeded by poolId + date.
  */
 export function generateMockApyHistory(poolId: string, now: Date = new Date()): ApyHistoryPoint[] {
   const utcMidnight = new Date(Date.UTC(
@@ -47,6 +52,7 @@ export function generateMockApyHistory(poolId: string, now: Date = new Date()): 
   ));
 
   const points: ApyHistoryPoint[] = [];
+  const BASE_APY = 12.5;
 
   // Oldest -> newest (last 7 days including today)
   for (let daysAgo = 6; daysAgo >= 0; daysAgo--) {
@@ -56,8 +62,11 @@ export function generateMockApyHistory(poolId: string, now: Date = new Date()): 
     const date = toUtcDateString(d);
     const seed = hashToSeed(`${poolId}-${date}`);
     const rand = seededRandom(seed); // 0..1
-    const variability = (rand * 4) - 2; // -2..+2
-    const apyPercentage = roundTo(10 + variability, 2);
+    // Map 0..1 to ±0.5..±1.5% noise
+    const noiseRange = 0.5 + rand; // 0.5 to 1.5
+    const noiseSign = rand > 0.5 ? 1 : -1;
+    const variability = noiseSign * noiseRange;
+    const apyPercentage = roundTo(BASE_APY + variability, 2);
 
     points.push({ date, apyPercentage });
   }
