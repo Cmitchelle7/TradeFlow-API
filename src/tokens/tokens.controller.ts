@@ -1,8 +1,6 @@
 import { Controller, Get, Query, HttpException, HttpStatus, Res, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
-import * as fs from 'fs';
-import * as path from 'path';
 
 @ApiTags('Tokens')
 @Controller('api/v1/tokens')
@@ -100,53 +98,59 @@ export class TokensController {
       type: 'object',
       properties: {
         symbol: { type: 'string', example: 'XLM' },
-        name: { type: 'string', example: 'Stellar Lumens' },
         description: { type: 'string' },
-        decimals: { type: 'number' },
-        issuer: { type: 'string' },
-        logo: { type: 'string' }
+        website: { type: 'string' },
+        twitter: { type: 'string' },
+        whitepaper: { type: 'string' }
       }
     }
   })
   @ApiResponse({ status: 404, description: 'Token metadata not found for the provided symbol' })
   getTokenMetadata(@Param('symbol') symbol: string) {
-    try {
-      // Read the tokenMetadata.json file
-      const metadataPath = path.join(__dirname, '../../data/tokenMetadata.json');
-      const metadataContent = fs.readFileSync(metadataPath, 'utf-8');
-      const tokenMetadata = JSON.parse(metadataContent);
+    const normalizedSymbol = symbol.trim().toUpperCase();
 
-      // Search for the token by symbol (case-insensitive)
-      const token = tokenMetadata.find(
-        (t: any) => t.symbol.toLowerCase() === symbol.toLowerCase()
-      );
-
-      if (!token) {
-        throw new HttpException(
-          {
-            statusCode: HttpStatus.NOT_FOUND,
-            message: `Token metadata not found for symbol: ${symbol}`,
-            error: 'Not Found'
-          },
-          HttpStatus.NOT_FOUND
-        );
+    const metadataBySymbol: Record<
+      string,
+      {
+        symbol: string;
+        description: string;
+        website: string;
+        twitter: string;
+        whitepaper: string;
       }
+    > = {
+      XLM: {
+        symbol: 'XLM',
+        description:
+          'XLM (Lumens) is the native token of the Stellar network, designed to facilitate fast, low-cost payments and asset issuance.',
+        website: 'https://www.stellar.org/',
+        twitter: 'https://twitter.com/StellarOrg',
+        whitepaper: 'https://www.stellar.org/papers/stellar-consensus-protocol',
+      },
+      USDC: {
+        symbol: 'USDC',
+        description:
+          'USDC is a USD-backed stablecoin intended to maintain a 1:1 peg with the US dollar and enable price-stable transfers across supported networks.',
+        website: 'https://www.centre.io/usdc',
+        twitter: 'https://twitter.com/circle',
+        whitepaper: 'https://www.centre.io/pdfs/centre-whitepaper.pdf',
+      },
+    };
 
-      return token;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
+    const token = metadataBySymbol[normalizedSymbol];
 
+    if (!token) {
       throw new HttpException(
         {
-          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Error reading token metadata',
-          error: 'Internal Server Error'
+          statusCode: HttpStatus.NOT_FOUND,
+          message: `Token metadata not found for symbol: ${normalizedSymbol}`,
+          error: 'Not Found',
         },
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.NOT_FOUND,
       );
     }
+
+    return token;
   }
 
   @Get('verify/:address')
