@@ -5,7 +5,7 @@ This document describes the standard error handling middleware implemented for t
 ## Overview
 
 The application now includes comprehensive error handling that ensures:
-- All unexpected errors are caught and handled gracefully
+- All unexpected errors are caught and handled gracefully,
 - API always responds with JSON format, even during errors
 - Errors are logged for debugging purposes
 - Consistent error response format across the application
