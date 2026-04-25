@@ -55,8 +55,20 @@ async function bootstrap() {
         console.error('Server cannot start due to missing configuration. Please check your .env file.');
         process.exit(1);
     }
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+        : ['http://localhost:3000', 'https://localhost:3000'];
     app.enableCors({
-        origin: true,
+        origin: (origin, callback) => {
+            if (!origin)
+                return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                callback(null, true);
+            }
+            else {
+                callback(new Error('Not allowed by CORS'), false);
+            }
+        },
         credentials: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe());
