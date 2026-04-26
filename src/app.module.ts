@@ -13,9 +13,26 @@ import { TokensModule } from './tokens/tokens.module';
 import { ThrottlerExceptionFilter } from './common/filters/throttler-exception.filter';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { OgModule } from './og/og.module';
+import { TradeModule } from './trade/trade.module';
+import { ConfigModule } from '@nestjs/config';
+import { MaintenanceMiddleware } from './common/middleware/maintenance.middleware';
+import { NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { RedisModule } from './common/redis/redis.module';
 
 @Module({
-  imports: [PrismaModule, HealthModule, RiskModule, AuthModule, AnalyticsModule, SwapModule, TokensModule, OgModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    RedisModule,
+    PrismaModule, 
+    HealthModule, 
+    RiskModule, 
+    AuthModule, 
+    AnalyticsModule, 
+    SwapModule, 
+    TokensModule, 
+    OgModule,
+    TradeModule
+  ],
   controllers: [AppController],
   providers: [
     AppService,
@@ -33,4 +50,10 @@ import { OgModule } from './og/og.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(MaintenanceMiddleware)
+      .forRoutes('*');
+  }
+}
