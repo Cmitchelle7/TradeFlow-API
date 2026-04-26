@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Trade, Pool, Token } from '@prisma/client';
+import { RedisService } from '../common/redis/redis.service';
 
 @Injectable()
 export class TradeService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private redisService: RedisService,
+  ) {}
 
   async createTrade(data: {
     poolId: string;
@@ -12,12 +16,15 @@ export class TradeService {
     amountIn: string;
     amountOut: string;
   }): Promise<Trade> {
-    return this.prisma.trade.create({
+    const trade = await this.prisma.trade.create({
       data: {
         ...data,
         timestamp: new Date(),
       },
     });
+
+    await this.redisService.publish('live_trades', JSON.stringify(trade));
+    return trade;
   }
 
   async getTradesByUser(userAddress: string): Promise<Trade[]> {

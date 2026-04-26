@@ -11,30 +11,25 @@ import { PrismaModule } from './prisma/prisma.module';
 import { TokensModule } from './tokens/tokens.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { OgModule } from './og/og.module';
-import { RequireJwtMiddleware } from './common/middleware/require-jwt.middleware';
-import { TimeoutMiddleware } from './common/middleware/timeout.middleware';
-import { ConfigModule } from './config/config.module';
-import { PoolsModule } from './pools/pools.module';
-import { WebhookBodyMiddleware } from './auth/middleware/webhook-body.middleware';
-import { PricesModule } from './prices/prices.module';
-import { InvoicesModule } from './invoices/invoices.module';
-import { WebhooksModule } from './webhooks/webhooks.module';
+import { TradeModule } from './trade/trade.module';
+import { ConfigModule } from '@nestjs/config';
+import { MaintenanceMiddleware } from './common/middleware/maintenance.middleware';
+import { NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { RedisModule } from './common/redis/redis.module';
 
 @Module({
   imports: [
-    PrismaModule,
-    HealthModule,
-    RiskModule,
-    AuthModule,
-    AnalyticsModule,
-    SwapModule,
-    TokensModule,
+    ConfigModule.forRoot({ isGlobal: true }),
+    RedisModule,
+    PrismaModule, 
+    HealthModule, 
+    RiskModule, 
+    AuthModule, 
+    AnalyticsModule, 
+    SwapModule, 
+    TokensModule, 
     OgModule,
-    ConfigModule,
-    PoolsModule,
-    PricesModule,
-    InvoicesModule,
-    WebhooksModule,
+    TradeModule
   ],
   controllers: [AppController],
   providers: [
@@ -47,24 +42,8 @@ import { WebhooksModule } from './webhooks/webhooks.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // Apply global request timeout to all routes
     consumer
-      .apply(TimeoutMiddleware)
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
-
-    // Apply webhook body middleware FIRST to capture raw body before JSON parsing
-    consumer
-      .apply(WebhookBodyMiddleware)
-      .forRoutes(
-        { path: 'api/v1/webhook/soroban', method: RequestMethod.POST },
-      );
-
-    // Then apply JWT middleware for authentication
-    consumer
-      .apply(RequireJwtMiddleware)
-      .forRoutes(
-        { path: 'api/v1/webhook/soroban', method: RequestMethod.POST },
-        { path: 'invoices', method: RequestMethod.POST },
-      );
+      .apply(MaintenanceMiddleware)
+      .forRoutes('*');
   }
 }
