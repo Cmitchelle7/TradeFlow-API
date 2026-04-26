@@ -28,6 +28,9 @@ let AppController = class AppController {
     createInvoice(createInvoiceDto) {
         return this.appService.processNewInvoice(createInvoiceDto);
     }
+    testError() {
+        throw new Error('This is a test error to verify global error handling works correctly');
+    }
 };
 exports.AppController = AppController;
 __decorate([
@@ -57,6 +60,14 @@ __decorate([
     __metadata("design:paramtypes", [create_invoice_dto_1.CreateInvoiceDto]),
     __metadata("design:returntype", invoice_dto_1.InvoiceDto)
 ], AppController.prototype, "createInvoice", null);
+__decorate([
+    (0, common_1.Get)('test-error'),
+    (0, swagger_1.ApiOperation)({ summary: 'Test error handling', description: 'Deliberately throws an error to test global error handling' }),
+    (0, swagger_1.ApiResponse)({ status: 500, description: 'Error handled by global exception filter' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AppController.prototype, "testError", null);
 exports.AppController = AppController = __decorate([
     (0, swagger_1.ApiTags)('Invoices'),
     (0, common_1.Controller)('invoices'),

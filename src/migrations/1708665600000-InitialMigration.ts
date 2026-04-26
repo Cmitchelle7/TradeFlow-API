@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table, Index } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableForeignKey, TableIndex } from 'typeorm';
 
 export class InitialMigration1708665600000 implements MigrationInterface {
   name = 'InitialMigration1708665600000';
@@ -117,18 +117,18 @@ export class InitialMigration1708665600000 implements MigrationInterface {
     // Create foreign key constraint
     await queryRunner.createForeignKey(
       'invoices',
-      {
+      new TableForeignKey({
         columnNames: ['userId'],
         referencedTableName: 'users',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
-      },
+      }),
     );
 
     // Create index for faster queries
     await queryRunner.createIndex(
       'invoices',
-      new Index('IDX_INVOICE_STATUS', ['status']),
+      new TableIndex({ name: 'IDX_INVOICE_STATUS', columnNames: ['status'] }),
     );
   }
 

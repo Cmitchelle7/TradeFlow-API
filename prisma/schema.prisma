@@ -17,7 +17,9 @@ model Trade {
   amountIn    String   // Using String to handle decimal values precisely
   amountOut   String   // Using String to handle decimal values precisely
   timestamp   DateTime @default(now())
-  
+
+  pool        Pool     @relation(fields: [poolId], references: [id])
+
   @@map("trades")
 }
 

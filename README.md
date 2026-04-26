@@ -90,3 +90,136 @@ curl http://localhost:3000/api/v1/stats/tvl?format=short
   "lastUpdated": "2026-03-19T00:00:00Z"
 }
 ```
+
+#### `GET /api/v1/stats/tvl/history`
+
+Get historical Total Value Locked (TVL) data for the analytics dashboard.
+
+**Response Format:**
+```json
+[
+  {
+    "date": "2026-03-26",
+    "tvlUSD": 10035254.53
+  },
+  {
+    "date": "2026-03-27",
+    "tvlUSD": 10161477.57
+  }
+]
+```
+
+**Description:**
+- Returns 30 days of historical TVL data
+- Each entry contains a date string and TVL amount in USD
+- Data simulates realistic protocol growth with 1.5% daily growth rate and 2% volatility
+- Dates are in YYYY-MM-DD format
+- TVL values are rounded to 2 decimal places
+
+**Example:**
+```bash
+curl http://localhost:3000/api/v1/stats/tvl/history
+```
+
+### Analytics Endpoints
+
+#### `GET /api/v1/analytics/leaderboard`
+
+Get the top traders leaderboard sorted by 7-day trading volume.
+
+**Response Format:**
+```json
+[
+  {
+    "rank": 1,
+    "walletAddress": "0x742d...8b4c",
+    "volumeUSD": 850000
+  },
+  {
+    "rank": 2,
+    "walletAddress": "0x8f3a...2d1e",
+    "volumeUSD": 720000
+  }
+]
+```
+
+### Token Verification
+
+#### `GET /api/v1/tokens/verify/:address`
+
+Check if a Stellar contract address is officially verified and safe to trade.
+
+**Response Format:**
+```json
+{
+  "isVerified": true,
+  "riskLevel": "LOW"
+}
+```
+
+**Parameters:**
+- `address` (path): Stellar contract address to verify
+
+### Network Fees
+
+#### `GET /api/v1/network/fees`
+
+Get current Stellar network fee estimates.
+
+**Response Format:**
+```json
+{
+  "success": true,
+  "data": {
+    "baseFee": 100,
+    "priorityFee": 500,
+    "estimatedTotal": 600
+  },
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+**Note:** This endpoint includes a 30-second cache header for performance optimization.
+
+### Webhook Endpoints
+
+#### `POST /api/v1/webhooks/stellar`
+
+Receive Stellar network events from external indexer services.
+
+**Request Format:**
+```json
+{
+  "event": "contract_event",
+  "contract": "stellar_contract_address",
+  "timestamp": "2026-04-24T21:47:41.467Z",
+  "data": {
+    "custom_fields": "event_data"
+  }
+}
+```
+
+**Response Format:**
+```json
+{
+  "received": true
+}
+```
+
+**Description:**
+- Accepts JSON payloads containing Stellar network events
+- Logs incoming events to console for debugging
+- Returns immediate 200 OK response to acknowledge receipt
+- Uses Express JSON body parser for payload handling
+- Designed for real-time dashboard updates from external indexer
+
+**Example:**
+```bash
+curl -X POST http://localhost:3000/api/v1/webhooks/stellar \
+  -H "Content-Type: application/json" \
+  -d '{"event": "contract_event", "contract": "test_address", "timestamp": "2026-04-24T21:47:41.467Z"}'
+```
+
+### Background Jobs
+
+The API includes a background indexer job that runs every 5 minutes to sync blockchain data. This is automatically initialized when the server starts and logs "Syncing Blockchain Data..." during each run.
