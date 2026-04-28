@@ -153,6 +153,47 @@ export class TokensController {
     return token;
   }
 
+  @Get('trending')
+  @ApiOperation({ summary: 'Get trending tokens by search volume', description: 'Returns a list of currently trending tokens based on dummy search volume data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Trending tokens retrieved successfully',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          symbol: { type: 'string', example: 'USDC' },
+          name: { type: 'string', example: 'USD Coin' },
+          contractAddress: { type: 'string' },
+          trendChange: { type: 'string', example: '+12.5%' },
+        },
+      },
+    },
+  })
+  getTrendingTokens() {
+    return [
+      {
+        symbol: 'USDC',
+        name: 'USD Coin',
+        contractAddress: 'GBBD47F6L3WRUIRDRN4Q3GUMF3VUEQBQO4FSKJ3DFOZQY2E4PWSJD3HU',
+        trendChange: '+12.5%',
+      },
+      {
+        symbol: 'yXLM',
+        name: 'Yield XLM',
+        contractAddress: 'GARDNV3Q7YGT4AKSDF25LT32YSCCW4EV22Y2TV3I2PU2MMXJTEDL5T55',
+        trendChange: '+8.3%',
+      },
+      {
+        symbol: 'AQUA',
+        name: 'Aquarius',
+        contractAddress: 'GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA',
+        trendChange: '+5.1%',
+      },
+    ];
+  }
+
   @Get('verify/:address')
   @ApiOperation({ summary: 'Verify if a token contract address is whitelisted', description: 'Check if a Stellar contract address is officially verified and safe to trade' })
   @ApiResponse({ 

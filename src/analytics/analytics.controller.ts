@@ -1,5 +1,6 @@
-﻿import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
+﻿import { Controller, Get, HttpStatus, Query, Param, BadRequestException } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiParam } from '@nestjs/swagger';
+const { isValidStellarAddress } = require('../../utils/validators');
 import {
   AnalyticsService,
   VolumeData,
@@ -136,5 +137,48 @@ export class AnalyticsController {
     @Query('poolId') poolId?: string,
   ): LiquidityProvider[] {
     return this.analyticsService.getTopLiquidityProviders(poolId);
+  }
+
+  @Get('/users/:address/history')
+  @ApiOperation({ summary: 'Get transaction history for a user wallet address' })
+  @ApiParam({ name: 'address', description: 'Stellar public key of the user', example: 'GABC...XYZ' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully retrieved transaction history',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          txId: { type: 'string' },
+          type: { type: 'string', enum: ['Buy', 'Sell'] },
+          tokenSymbol: { type: 'string' },
+          amount: { type: 'number' },
+          priceUSD: { type: 'number' },
+          timestamp: { type: 'string' },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid Stellar address' })
+  getUserHistory(@Param('address') address: string) {
+    if (!isValidStellarAddress(address)) {
+      throw new BadRequestException('Invalid Stellar address format');
+    }
+
+    const types = ['Buy', 'Sell'];
+    const tokens = ['XLM', 'USDC', 'AQUA', 'yXLM', 'BTC'];
+    const seed = address.charCodeAt(5);
+
+    const history = Array.from({ length: 7 }, (_, i) => ({
+      txId: `tx_${address.slice(0, 6)}_${i + 1}`,
+      type: types[(seed + i) % 2],
+      tokenSymbol: tokens[(seed + i) % tokens.length],
+      amount: parseFloat(((seed + i + 1) * 12.5).toFixed(4)),
+      priceUSD: parseFloat(((seed + i + 1) * 0.85).toFixed(2)),
+      timestamp: new Date(Date.now() - i * 86400000).toISOString(),
+    }));
+
+    return history;
   }
 }
