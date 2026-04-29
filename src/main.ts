@@ -1,8 +1,9 @@
-﻿import { NestFactory, HttpAdapterHost } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { ValidationPipe, LogLevel } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { IndexerJob } from './jobs/indexer';
+import { CustomLogger } from './common/logger/custom.logger';
 import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
 import compression from 'compression';
@@ -31,7 +32,9 @@ async function bootstrap() {
   const nodeEnv = process.env.NODE_ENV ?? 'development';
 
   const app = await NestFactory.create(AppModule, {
-    logger: getLogLevels(nodeEnv),
+    logger: new CustomLogger('App', {
+      logLevels: getLogLevels(nodeEnv),
+    }),
   });
 
   // Security: Disable X-Powered-By header to hide Express.js stack
