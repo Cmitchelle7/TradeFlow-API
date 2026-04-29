@@ -3,7 +3,7 @@ import { Request } from 'express';
 import * as crypto from 'crypto';
 
 /**
- * HMAC Signature Verification Guard
+ * HMAC Signature Verification Guard.
  * 
  * Verifies cryptographic HMAC signatures in webhook headers to prevent spoofing.
  * Uses constant-time comparison to mitigate timing attacks.
@@ -16,6 +16,14 @@ import * as crypto from 'crypto';
  */
 @Injectable()
 export class HmacSignatureGuard implements CanActivate {
+  /**
+   * Validates the incoming request by checking its HMAC signature.
+   * 
+   * @param context - The execution context of the request.
+   * @returns A boolean indicating if the request is authorized.
+   * @throws UnauthorizedException if the secret is missing or the signature is invalid.
+   * @throws BadRequestException if the header or raw body is missing.
+   */
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
     

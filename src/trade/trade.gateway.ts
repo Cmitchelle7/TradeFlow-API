@@ -3,6 +3,10 @@ import { Server } from 'socket.io';
 import { RedisService } from '../common/redis/redis.service';
 import { Logger } from '@nestjs/common';
 
+/**
+ * WebSocket Gateway for real-time trade updates.
+ * Subscribes to Redis 'live_trades' channel and broadcasts messages to connected clients.
+ */
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -16,6 +20,9 @@ export class TradeGateway implements OnModuleInit {
 
   constructor(private readonly redisService: RedisService) {}
 
+  /**
+   * Initializes the gateway and starts listening for Redis messages.
+   */
   onModuleInit() {
     this.redisService.subscribe('live_trades', (message) => {
       this.logger.log(`Received trade from Redis: ${message}`);

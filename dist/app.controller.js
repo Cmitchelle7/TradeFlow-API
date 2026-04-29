@@ -31,10 +31,13 @@ let AppController = class AppController {
     testError() {
         throw new Error('This is a test error to verify global error handling works correctly');
     }
+    ping() {
+        return 'pong';
+    }
 };
 exports.AppController = AppController;
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)('invoices'),
     (0, swagger_1.ApiOperation)({ summary: 'Retrieve all invoices', description: 'Returns a list of all processed invoices' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
@@ -46,7 +49,7 @@ __decorate([
     __metadata("design:returntype", Array)
 ], AppController.prototype, "getInvoices", null);
 __decorate([
-    (0, common_1.Post)(),
+    (0, common_1.Post)('invoices'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new invoice', description: 'Submits a new invoice for risk assessment and processing' }),
     (0, swagger_1.ApiBody)({ type: create_invoice_dto_1.CreateInvoiceDto, description: 'Invoice details' }),
     (0, swagger_1.ApiResponse)({
@@ -68,9 +71,17 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AppController.prototype, "testError", null);
+__decorate([
+    (0, common_1.Get)('ping'),
+    (0, swagger_1.ApiOperation)({ summary: 'Ping the server', description: 'Simple endpoint to check if the server is up' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Server is up' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", String)
+], AppController.prototype, "ping", null);
 exports.AppController = AppController = __decorate([
     (0, swagger_1.ApiTags)('Invoices'),
-    (0, common_1.Controller)('invoices'),
+    (0, common_1.Controller)(),
     __metadata("design:paramtypes", [app_service_1.AppService])
 ], AppController);
 //# sourceMappingURL=app.controller.js.map

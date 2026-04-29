@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { createHmac } from 'crypto';
 
 /**
- * Webhook Body Parser Middleware
+ * Webhook Body Parser Middleware.
  * 
  * Captures the raw request body for webhook endpoints before JSON parsing.
  * Stores the raw body on the request object for HMAC signature verification.
@@ -12,6 +12,13 @@ import { createHmac } from 'crypto';
  */
 @Injectable()
 export class WebhookBodyMiddleware implements NestMiddleware {
+  /**
+   * Captures the raw stream of the request body and attaches it to the request object.
+   * 
+   * @param req - The Express request object.
+   * @param res - The Express response object.
+   * @param next - The next function in the middleware chain.
+   */
   use(req: Request, res: Response, next: NextFunction) {
     // Only process POST requests to webhook endpoints
     if (req.method !== 'POST' || !req.path.includes('/webhook')) {

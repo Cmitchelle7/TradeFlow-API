@@ -5,8 +5,10 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const app_module_1 = require("./app.module");
 const indexer_1 = require("./jobs/indexer");
+const custom_logger_1 = require("./common/logger/custom.logger");
 const express_rate_limit_1 = require("express-rate-limit");
 const rate_limit_redis_1 = require("rate-limit-redis");
+const compression_1 = require("compression");
 let redis = null;
 try {
     redis = require('../config/redis');
@@ -28,9 +30,12 @@ async function bootstrap() {
     var _a, _b;
     const nodeEnv = (_a = process.env.NODE_ENV) !== null && _a !== void 0 ? _a : 'development';
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
-        logger: getLogLevels(nodeEnv),
+        logger: new custom_logger_1.CustomLogger('App', {
+            logLevels: getLogLevels(nodeEnv),
+        }),
     });
     app.getHttpAdapter().getInstance().disable('x-powered-by');
+    app.use((0, compression_1.default)());
     app.use((0, express_rate_limit_1.default)(Object.assign(Object.assign({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }, (redis
         ? {
             store: new rate_limit_redis_1.default({

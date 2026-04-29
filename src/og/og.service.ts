@@ -1,9 +1,20 @@
 import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 
+/**
+ * Service responsible for generating dynamic OpenGraph (OG) images for pools.
+ * Generates SVG templates based on pool statistics like TVL, Volume, and APR.
+ */
 @Injectable()
 export class OgService {
   private readonly logger = new Logger(OgService.name);
 
+  /**
+   * Generates an OG image in SVG format for a specific pool.
+   * 
+   * @param poolId - The unique identifier of the pool.
+   * @returns A promise resolving to the SVG string content.
+   * @throws HttpException if the pool is not found.
+   */
   async generatePoolOgImage(poolId: string): Promise<string> {
     try {
       // For now, use dummy data as per requirements
@@ -17,6 +28,14 @@ export class OgService {
     }
   }
 
+  /**
+   * Retrieves pool data for image generation.
+   * Currently uses mock data for demonstration.
+   * 
+   * @param poolId - The unique identifier of the pool.
+   * @returns An object containing pool metrics.
+   * @private
+   */
   private async getPoolData(poolId: string): Promise<{
     token0Symbol: string;
     token1Symbol: string;
@@ -53,6 +72,13 @@ export class OgService {
     };
   }
 
+  /**
+   * Generates the SVG string using a template and pool data.
+   * 
+   * @param poolData - The data to inject into the SVG template.
+   * @returns A string containing the complete SVG XML.
+   * @private
+   */
   private generateSvgTemplate(poolData: {
     token0Symbol: string;
     token1Symbol: string;

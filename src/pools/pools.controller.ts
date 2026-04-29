@@ -3,9 +3,19 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApyHistoryPoint, generateMockApyHistory } from './apy-history.helper';
 import { PoolIdParamDto } from './dto/pool-id-param.dto';
 
+/**
+ * Controller for liquidity pool information and history.
+ * Provides simulated APY history and recent trade data for pools.
+ */
 @ApiTags('pools')
 @Controller('api/v1/pools')
 export class PoolsController {
+  /**
+   * Retrieves a 7-day simulated APY history for a specific pool.
+   * 
+   * @param params - The DTO containing the poolId.
+   * @returns An array of ApyHistoryPoint objects.
+   */
   @Get(':poolId/apy-history')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get 7-day simulated APY history for a pool' })
@@ -20,6 +30,13 @@ export class PoolsController {
     return generateMockApyHistory(params.poolId);
   }
 
+  /**
+   * Retrieves recent mock trade activity for a specific pool.
+   * 
+   * @param params - The DTO containing the poolId.
+   * @param limitRaw - Optional query parameter to limit the number of returned trades.
+   * @returns An object containing the pool ID, trade count, and a list of mock trades.
+   */
   @Get(':poolId/trades')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get recent mock trades for a pool' })

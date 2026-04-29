@@ -3,11 +3,22 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { Response } from 'express';
 import { OgService } from './og.service';
 
+/**
+ * Controller for OpenGraph image generation.
+ * Serves dynamic SVG images for social media sharing.
+ */
 @ApiTags('og')
 @Controller('api/v1/og')
 export class OgController {
   constructor(private readonly ogService: OgService) {}
 
+  /**
+   * Generates and serves a dynamic OG image for a specific pool.
+   * Sets appropriate content-type and caching headers.
+   * 
+   * @param poolId - The unique ID of the pool.
+   * @param res - The Express response object.
+   */
   @Get('pool/:poolId')
   @ApiOperation({ summary: 'Generate dynamic OpenGraph image for a pool' })
   @ApiParam({ name: 'poolId', description: 'Pool ID', type: 'string' })
