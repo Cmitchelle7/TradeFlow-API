@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { IndexerJob } from './jobs/indexer';
 import rateLimit from 'express-rate-limit';
 import RedisStore from 'rate-limit-redis';
+import compression from 'compression';
 
 // Redis is optional - gracefully fall back to in-memory limiting if unavailable
 let redis: any = null;
@@ -35,6 +36,9 @@ async function bootstrap() {
 
   // Security: Disable X-Powered-By header to hide Express.js stack
   app.getHttpAdapter().getInstance().disable('x-powered-by');
+
+  // Gzip compression for all responses
+  app.use(compression());
 
   // Global Rate Limiting (Redis-backed when available, in-memory fallback)
   app.use(
