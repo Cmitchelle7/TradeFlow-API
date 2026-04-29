@@ -6,8 +6,19 @@ export interface ParsedInvoice {
   dueDate?: string;
 }
 
+/**
+ * Service for parsing PDF invoice files using optical character recognition (OCR) patterns.
+ * Extracts key financial metadata like total amounts and due dates.
+ */
 @Injectable()
 export class PdfService {
+  /**
+   * Parses a PDF buffer to extract invoice data.
+   * 
+   * @param pdfBuffer - The raw binary buffer of the PDF file.
+   * @returns A promise resolving to a ParsedInvoice object.
+   * @throws Error if the PDF parsing fails.
+   */
   async parseInvoicePdf(pdfBuffer: Buffer): Promise<ParsedInvoice> {
     try {
       const data = await pdfParse(pdfBuffer);
@@ -25,6 +36,14 @@ export class PdfService {
     }
   }
 
+  /**
+   * Searches the text content for potential currency amounts using regex patterns.
+   * Identifies the largest amount found as the likely total.
+   * 
+   * @param text - The raw text extracted from the PDF.
+   * @returns The largest positive amount found, or undefined if none found.
+   * @private
+   */
   private extractTotalAmount(text: string): number | undefined {
     // Regex patterns to find currency amounts
     const patterns = [
@@ -57,6 +76,13 @@ export class PdfService {
     return amounts.length > 0 ? Math.max(...amounts) : undefined;
   }
 
+  /**
+   * Searches the text content for potential due dates using regex patterns.
+   * 
+   * @param text - The raw text extracted from the PDF.
+   * @returns The first valid date found in ISO format, or undefined.
+   * @private
+   */
   private extractDueDate(text: string): string | undefined {
     // Regex patterns to find dates
     const patterns = [
@@ -80,6 +106,13 @@ export class PdfService {
     return undefined;
   }
 
+  /**
+   * Normalizes a date string into ISO 8601 format (YYYY-MM-DD).
+   * 
+   * @param dateString - The raw date string to normalize.
+   * @returns The normalized date string, or the original if invalid.
+   * @private
+   */
   private normalizeDate(dateString: string): string {
     // Convert various date formats to ISO format (YYYY-MM-DD)
     const date = new Date(dateString);

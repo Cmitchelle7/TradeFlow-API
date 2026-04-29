@@ -1,6 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RiskService } from './risk.service';
 
+/**
+ * Unit tests for the RiskService.
+ * Verifies score calculation accuracy, reproducibility, and input validation.
+ */
 describe('RiskService', () => {
   let service: RiskService;
 
@@ -12,16 +16,26 @@ describe('RiskService', () => {
     service = module.get<RiskService>(RiskService);
   });
 
+  /**
+   * Basic sanity check to ensure the service is correctly instantiated.
+   */
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
+  /**
+   * Verifies that the calculated score always falls within the expected 0-100 range.
+   */
   it('should return a score between 0 and 100', () => {
     const score = service.calculateScore(5000, new Date());
     expect(score).toBeGreaterThanOrEqual(0);
     expect(score).toBeLessThanOrEqual(100);
   });
 
+  /**
+   * Ensures that the seeded pseudo-randomness is deterministic.
+   * Identical inputs MUST result in the exact same risk score.
+   */
   it('should return consistently the same score for the exact same inputs (Acceptance Criteria)', () => {
     const amount = 15000;
     const date = new Date('2023-10-01T12:00:00Z');
@@ -35,6 +49,9 @@ describe('RiskService', () => {
     expect(score2).toEqual(score3);
   });
 
+  /**
+   * Checks that scores vary when inputs change, demonstrating sensitivity to time and amount.
+   */
   it('should vary scores for slightly different dates/amounts', () => {
     const amount = 15000;
     const date1 = new Date('2023-10-01T12:00:00Z');
@@ -50,6 +67,9 @@ describe('RiskService', () => {
     expect(score2).toBeDefined();
   });
 
+  /**
+   * Validates that the base scoring rules (amount-based tiers) are correctly applied.
+   */
   it('should base score on amount rules', () => {
     const date = new Date();
     
