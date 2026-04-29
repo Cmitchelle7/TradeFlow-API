@@ -10,10 +10,20 @@ const MOCK_PRICES = [
   { symbol: 'XLM', price: 0.12 },
 ];
 
+/**
+ * Service responsible for fetching and caching asset prices.
+ * Integrates with CoinGecko for real-time data and uses a local cache for performance.
+ */
 @Injectable()
 export class PricesService {
   private readonly logger = new Logger(PricesService.name);
 
+  /**
+   * Retrieves the current prices for supported assets.
+   * Checks the local cache first before attempting an external API call.
+   * 
+   * @returns A promise resolving to the price data and cache status.
+   */
   async getPrices(): Promise<{ data: { symbol: string; price: number }[]; cached: boolean }> {
     const cached = cache.get(CACHE_KEY);
 
@@ -29,6 +39,13 @@ export class PricesService {
     return { data: prices, cached: false };
   }
 
+  /**
+   * Fetches real-time price data from the CoinGecko API.
+   * Implements a fallback mechanism to mock data if the API request fails.
+   * 
+   * @returns A promise resolving to an array of asset price objects.
+   * @private
+   */
   private async fetchPrices(): Promise<{ symbol: string; price: number }[]> {
     try {
       const response = await axios.get(

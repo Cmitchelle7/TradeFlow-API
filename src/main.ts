@@ -28,6 +28,10 @@ function getLogLevels(nodeEnv: string): LogLevel[] {
   }
 }
 
+/**
+ * Entry point for the NestJS application.
+ * Configures the app with global middleware, security headers, compression, and Swagger documentation.
+ */
 async function bootstrap() {
   const nodeEnv = process.env.NODE_ENV ?? 'development';
 

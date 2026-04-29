@@ -6,11 +6,22 @@ export class EstimatePriceImpactDto {
   amountIn: number;
 }
 
+/**
+ * Controller for asset swap operations.
+ * Currently supports price impact estimation for trade simulation.
+ */
 @ApiTags('swap')
 @Controller('api/v1/swap')
 export class SwapController {
   constructor(private readonly swapService: SwapService) {}
 
+  /**
+   * Estimates the price impact for a given input amount.
+   * Useful for informing users about potential slippage before they execute a swap.
+   * 
+   * @param body - The DTO containing the amount of asset to swap.
+   * @returns An object with the original amount, estimated impact, and timestamp.
+   */
   @Post('estimate')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Estimate price impact for a swap' })

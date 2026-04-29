@@ -2,11 +2,21 @@ import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/commo
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 
+/**
+ * Controller for authentication-related endpoints.
+ * Handles the wallet-based authentication flow (nonce-challenge-signature).
+ */
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Generates a unique nonce to be signed by the user's wallet.
+   * Part of the challenge-response authentication mechanism.
+   * 
+   * @returns An object containing the generated nonce.
+   */
   @Post('challenge')
   @ApiOperation({ summary: 'Get authentication challenge nonce' })
   @ApiResponse({ status: 200, description: 'Nonce generated successfully', schema: { type: 'object', properties: { nonce: { type: 'string' } } } })
@@ -15,6 +25,13 @@ export class AuthController {
     return { nonce };
   }
 
+  /**
+   * Validates a wallet signature and returns a JWT if successful.
+   * 
+   * @param body - Contains the public key, the signature, and the nonce that was signed.
+   * @returns An object containing the signed JWT token.
+   * @throws HttpException if fields are missing or the signature is invalid.
+   */
   @Post('login')
   @ApiOperation({ summary: 'Authenticate with wallet signature' })
   @ApiResponse({ status: 200, description: 'Authentication successful', schema: { type: 'object', properties: { token: { type: 'string' } } } })
