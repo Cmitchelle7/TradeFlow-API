@@ -7,4 +7,5 @@ export declare class AppController {
     getInvoices(): InvoiceDto[];
     createInvoice(createInvoiceDto: CreateInvoiceDto): InvoiceDto;
     testError(): never;
+    ping(): string;
 }

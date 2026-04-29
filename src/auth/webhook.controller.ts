@@ -2,10 +2,20 @@ import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs
 import { ApiTags, ApiOperation, ApiResponse, ApiHeader } from '@nestjs/swagger';
 import { HmacSignatureGuard } from './guards/hmac-signature.guard';
 
+/**
+ * Controller for receiving and processing external webhooks.
+ */
 @ApiTags('webhooks')
 @Controller('api/v1/webhook')
 export class WebhookController {
   
+  /**
+   * Processes incoming Stellar Soroban smart contract events.
+   * This endpoint is protected by HMAC signature verification to ensure authenticity.
+   * 
+   * @param eventData - The payload containing event details from the Soroban network.
+   * @returns A success status and the reception timestamp.
+   */
   @Post('soroban')
   @HttpCode(HttpStatus.OK)
   @UseGuards(HmacSignatureGuard)

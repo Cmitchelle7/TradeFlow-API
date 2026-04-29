@@ -2,11 +2,21 @@ import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/commo
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 
+/**
+ * Controller for administrative tasks and dashboard access.
+ */
 @ApiTags('admin')
 @Controller('api/v1/admin')
 export class AdminController {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Authenticates an administrator using a static password.
+   * 
+   * @param body - DTO containing the administrator password.
+   * @returns A signed JWT for administrative access.
+   * @throws HttpException if the password is missing or incorrect.
+   */
   @Post('login')
   @ApiOperation({ summary: 'Admin login for backend dashboard' })
   @ApiResponse({ 
