@@ -1,10 +1,19 @@
-﻿import { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Service responsible for monitoring the operational health of the protocol.
+ * Checks database connectivity, indexer latency, and pool availability.
+ */
 @Injectable()
 export class HealthService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /**
+   * Performs a comprehensive health check across all core system components.
+   * 
+   * @returns An object containing the overall status, timestamp, and detailed component metrics.
+   */
   async getProtocolHealth() {
     const timestamp = new Date().toISOString();
 

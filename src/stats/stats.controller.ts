@@ -1,7 +1,18 @@
 import { Controller, Get, Query } from '@nestjs/common';
 
+/**
+ * Controller for retrieving global network and protocol statistics.
+ * Provides endpoints for Total Value Locked (TVL) and historical growth data.
+ */
 @Controller('api/v1/stats')
 export class StatsController {
+  /**
+   * Retrieves the current Total Value Locked (TVL) in the protocol.
+   * Supports optional formatting (e.g., "14.5M").
+   * 
+   * @param format - Optional format style ('short' or 'full').
+   * @returns An object containing the TVL in USD and the last update timestamp.
+   */
   @Get('tvl')
   async getTVL(@Query('format') format?: string) {
     const staticTVL = 14500000.50;
@@ -22,6 +33,12 @@ export class StatsController {
     };
   }
 
+  /**
+   * Retrieves the historical TVL data for the past 30 days.
+   * Generates a realistic growth trend with simulated daily volatility.
+   * 
+   * @returns An array of daily TVL history points.
+   */
   @Get('tvl/history')
   async getTVLHistory() {
     const history = [];
@@ -50,6 +67,13 @@ export class StatsController {
     return history;
   }
 
+  /**
+   * Formats a numeric value into a human-readable string (K, M, B).
+   * 
+   * @param amount - The numeric value to format.
+   * @returns A formatted string representation.
+   * @private
+   */
   private formatTVL(amount: number): string {
     if (amount >= 1000000000) {
       return `${(amount / 1000000000).toFixed(1)}B`;
