@@ -1,4 +1,4 @@
-﻿import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -14,7 +14,7 @@ import { OgModule } from './og/og.module';
 import { TradeModule } from './trade/trade.module';
 import { ConfigModule } from '@nestjs/config';
 import { MaintenanceMiddleware } from './common/middleware/maintenance.middleware';
-import { NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { RedisModule } from './common/redis/redis.module';
 
 @Module({
@@ -43,7 +43,7 @@ import { RedisModule } from './common/redis/redis.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(MaintenanceMiddleware)
+      .apply(RequestIdMiddleware, MaintenanceMiddleware)
       .forRoutes('*');
   }
 }
