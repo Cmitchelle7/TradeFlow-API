@@ -1,4 +1,4 @@
-﻿import { Controller, Get, HttpStatus, Query, Param, BadRequestException } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query, Param, BadRequestException } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags, ApiQuery, ApiParam } from '@nestjs/swagger';
 const { isValidStellarAddress } = require('../../utils/validators');
 import {
@@ -9,11 +9,20 @@ import {
   LiquidityProvider,
 } from './analytics.service';
 
+/**
+ * Controller for analytics-related endpoints.
+ * Provides access to historical volume data, IL calculations, and leaderboards.
+ */
 @ApiTags('Analytics')
 @Controller('api/v1/analytics')
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
+  /**
+   * Endpoint to retrieve historical trading volume data for the last 7 days.
+   * 
+   * @returns An array of VolumeData objects.
+   */
   @Get('volume')
   @ApiOperation({ summary: 'Get historical trading volume data' })
   @ApiResponse({

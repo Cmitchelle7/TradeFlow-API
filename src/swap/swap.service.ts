@@ -1,7 +1,18 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 
+/**
+ * Service responsible for swap-related calculations and operations.
+ */
 @Injectable()
 export class SwapService {
+  /**
+   * Calculates the estimated price impact for a swap based on the input amount.
+   * This uses a tiered approach with linear interpolation for mid-range amounts.
+   * 
+   * @param amountIn - The amount of the input asset being swapped.
+   * @returns An object containing the original amount, calculated price impact, and timestamp.
+   * @throws BadRequestException if amountIn is not a positive number.
+   */
   calculatePriceImpact(amountIn: number) {
     if (!amountIn || amountIn <= 0) {
       throw new BadRequestException('amountIn must be a positive number');

@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Horizon } from '@stellar/stellar-sdk';
 
+/**
+ * Service for interacting with Stellar assets and tokens.
+ * Handles searching, caching, and retrieving asset information from Horizon.
+ */
 @Injectable()
 export class TokensService {
   private readonly logger = new Logger(TokensService.name);
@@ -14,6 +18,13 @@ export class TokensService {
     this.server = new Horizon.Server('https://horizon-testnet.stellar.org');
   }
 
+  /**
+   * Searches for tokens on the Stellar network based on a query string.
+   * Utilizes Redis for distributed caching to optimize performance.
+   * 
+   * @param searchQuery - The string to search for in asset codes or issuers.
+   * @returns A promise resolving to the search results and cache status.
+   */
   async searchTokens(searchQuery: string): Promise<{
     message: string;
     searchQuery: string;
@@ -71,6 +82,12 @@ export class TokensService {
     };
   }
 
+  /**
+   * Fetches the latest asset records directly from the Stellar Horizon API.
+   * 
+   * @returns A promise resolving to an array of transformed asset objects.
+   * @private
+   */
   private async fetchAssetsFromHorizon(): Promise<any[]> {
     try {
       // Fetch assets from Horizon API
@@ -94,6 +111,12 @@ export class TokensService {
     }
   }
 
+  /**
+   * Provides a fallback set of mock assets in case of network or cache failures.
+   * 
+   * @returns An array of mock asset objects resembling the Stellar structure.
+   * @private
+   */
   private getMockAssets(): any[] {
     // Fallback mock data that resembles Stellar asset structure
     return [

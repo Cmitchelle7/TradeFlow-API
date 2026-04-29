@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 export interface VolumeData {
   date: string;
@@ -26,8 +26,17 @@ export interface LiquidityProvider {
   sharePercentage: number;
 }
 
+/**
+ * Service responsible for generating and calculating analytics data.
+ * This includes volume data, impermanent loss, and leaderboards.
+ */
 @Injectable()
 export class AnalyticsService {
+  /**
+   * Generates mock trading volume data for the last 7 days.
+   * 
+   * @returns An array of VolumeData objects containing dates and volume in USD.
+   */
   generateMockVolumeData(): VolumeData[] {
     const data: VolumeData[] = [];
     const today = new Date();
@@ -49,6 +58,15 @@ export class AnalyticsService {
     return data;
   }
 
+  /**
+   * Calculates the impermanent loss between an entry price ratio and a current price ratio.
+   * Formula: IL = (2 * sqrt(priceRatio)) / (1 + priceRatio) - 1
+   * 
+   * @param entryPriceRatio - The initial price ratio between two assets.
+   * @param currentPriceRatio - The current price ratio between two assets.
+   * @returns ImpermanentLossData containing the original ratios and the loss percentage.
+   * @throws Error if price ratios are not positive numbers.
+   */
   calculateImpermanentLoss(entryPriceRatio: number, currentPriceRatio: number): ImpermanentLossData {
     if (entryPriceRatio <= 0 || currentPriceRatio <= 0) {
       throw new Error('Price ratios must be positive numbers');
@@ -65,6 +83,11 @@ export class AnalyticsService {
     };
   }
 
+  /**
+   * Generates a mock leaderboard of top traders by volume.
+   * 
+   * @returns An array of LeaderboardEntry objects sorted by rank.
+   */
   generateLeaderboard(): LeaderboardEntry[] {
     const dummyWallets = [
       '0x742d...8b4c',
@@ -90,6 +113,12 @@ export class AnalyticsService {
     return leaderboard;
   }
 
+  /**
+   * Retrieves mock top liquidity providers, optionally filtered by pool ID.
+   * 
+   * @param poolId - Optional pool identifier to filter the providers.
+   * @returns An array of LiquidityProvider objects.
+   */
   getTopLiquidityProviders(poolId?: string): LiquidityProvider[] {
     const pools = [
       { poolId: 'pool-001', poolPair: 'USDC/XLM' },

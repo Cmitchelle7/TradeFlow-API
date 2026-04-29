@@ -2,6 +2,10 @@ import { Controller, Get, Query, HttpException, HttpStatus, Res, Param } from '@
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
 
+/**
+ * Controller for token-related operations.
+ * Handles token discovery, search, and metadata retrieval.
+ */
 @ApiTags('Tokens')
 @Controller('api/v1/tokens')
 export class TokensController {
@@ -17,6 +21,13 @@ export class TokensController {
     'GA6HCMBLTZS5VYYBCATRBRZB5J2J2F2ZQ5JQ6LQ5J3E3MNJNGHG35TV'
   ];
   
+  /**
+   * Searches for tokens by symbol with built-in caching.
+   * 
+   * @param searchQuery - The symbol to search for.
+   * @param res - The Express response object for custom header setting.
+   * @returns A JSON response with search results and cache status.
+   */
   @Get()
   @ApiOperation({ summary: 'Search for tokens by symbol', description: 'Search for tokens using a symbol query parameter' })
   @ApiQuery({ name: 'search', required: false, description: 'Token symbol to search for' })
@@ -74,6 +85,12 @@ export class TokensController {
     });
   }
 
+  /**
+   * Intentionally vulnerable endpoint for testing XSS protection mechanisms.
+   * 
+   * @param searchQuery - The query to reflect back.
+   * @returns An object with the reflected query and timestamp.
+   */
   @Get('vulnerable')
   @ApiOperation({ summary: 'Vulnerable endpoint for testing XSS', description: 'This endpoint reflects user input without sanitization (for testing purposes)' })
   @ApiQuery({ name: 'search', required: false, description: 'Search query that will be reflected back' })

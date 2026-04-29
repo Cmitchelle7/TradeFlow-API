@@ -17,6 +17,10 @@ import { MaintenanceMiddleware } from './common/middleware/maintenance.middlewar
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { RedisModule } from './common/redis/redis.module';
 
+/**
+ * Root module of the application.
+ * Orchestrates the integration of all feature modules and global middleware.
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -41,6 +45,12 @@ import { RedisModule } from './common/redis/redis.module';
   ],
 })
 export class AppModule implements NestModule {
+  /**
+   * Configures global middleware for the entire application.
+   * Currently applies RequestIdMiddleware and MaintenanceMiddleware to all routes.
+   * 
+   * @param consumer - The middleware consumer to register middleware on.
+   */
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(RequestIdMiddleware, MaintenanceMiddleware)

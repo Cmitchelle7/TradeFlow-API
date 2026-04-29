@@ -8,10 +8,20 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+/**
+ * Global exception filter that catches all unhandled exceptions.
+ * Standardizes the error response format and logs the error details.
+ */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
+  /**
+   * Catches an exception and transforms it into a standard JSON response.
+   * 
+   * @param exception - The error or exception object caught by NestJS.
+   * @param host - The arguments host providing access to the request/response context.
+   */
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

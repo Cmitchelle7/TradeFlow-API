@@ -1,5 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 
+/**
+ * Service for calculating risk scores for financial instruments like invoices.
+ * Uses a deterministic algorithm combining base scoring and seeded pseudo-randomness.
+ */
 @Injectable()
 export class RiskService {
   // Linear Congruential Generator constants for pseudo-random number generation
@@ -57,6 +61,14 @@ export class RiskService {
     return Math.round(finalScore);
   }
 
+  /**
+   * Validates input parameters for score calculation.
+   * 
+   * @param amount - The amount to validate.
+   * @param date - The date to validate.
+   * @throws BadRequestException if inputs are invalid.
+   * @private
+   */
   private validateInputs(amount: number, date: Date): void {
     if (amount === null || amount === undefined || typeof amount !== 'number' || isNaN(amount)) {
       throw new BadRequestException('Amount must be a valid number.');
@@ -72,6 +84,11 @@ export class RiskService {
   /**
    * Generates a deterministic seed based on input parameters.
    * This ensures that the same invoice (same amount and date) always gets the same random factor.
+   * 
+   * @param amount - The invoice amount.
+   * @param date - The invoice date.
+   * @returns A numeric hash value to be used as a seed.
+   * @private
    */
   private generateSeed(amount: number, date: Date): number {
     // Create a string representation to hash
@@ -90,6 +107,10 @@ export class RiskService {
   /**
    * Simple Linear Congruential Generator for seeded random numbers.
    * Returns a number between 0 (inclusive) and 1 (exclusive).
+   * 
+   * @param seed - The seed to initialize the generator.
+   * @returns A pseudo-random number between 0 and 1.
+   * @private
    */
   private seededRandom(seed: number): number {
     // next = (a * seed + c) % m
