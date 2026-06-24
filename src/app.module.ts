@@ -13,6 +13,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { OgModule } from './og/og.module';
 import { TradeModule } from './trade/trade.module';
 import { OrdersModule } from './orders/orders.module';
+import { GasModule } from './gas/gas.module';
 import { ConfigModule } from '@nestjs/config';
 import { MaintenanceMiddleware } from './common/middleware/maintenance.middleware';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
@@ -32,6 +33,7 @@ import { RedisModule } from './common/redis/redis.module';
     OgModule,
     TradeModule,
     OrdersModule,
+    GasModule,
   ],
   controllers: [AppController],
   providers: [
