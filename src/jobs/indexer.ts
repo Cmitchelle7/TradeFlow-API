@@ -1,27 +1,24 @@
-import * as cron from 'node-cron';
+﻿import * as cron from 'node-cron';
+import { RedisService } from '../common/redis/redis.service';
 
 export class IndexerJob {
-  constructor() {
-    this.initializeJobs();
-  }
+  private redisService: RedisService;
+  constructor(redisService?: RedisService) { this.redisService = redisService; this.initializeJobs(); }
 
   private initializeJobs() {
-    // Schedule a job to run every 5 minutes
-    cron.schedule('*/5 * * * *', () => {
-      console.log('Syncing Blockchain Data...');
-      this.syncBlockchainData();
-    });
-
-    console.log('Background indexer jobs initialized');
+    cron.schedule('*/1 * * * *', () => this.syncBlockchainData());
   }
 
   private syncBlockchainData() {
-    // Simulate blockchain data syncing
-    console.log(`[${new Date().toISOString()}] Starting blockchain data sync...`);
-    
-    // Simulate some work
-    setTimeout(() => {
-      console.log(`[${new Date().toISOString()}] Blockchain data sync completed`);
-    }, 2000);
+    const events = [
+      { event: 'InvoiceStatusChanged', data: { invoiceId: 'inv_001', status: 'FUNDED' } },
+      { event: 'LiquidityPoolUpdated', data: { poolId: 'pool_001', liquidity: '150000' } },
+      { event: 'YieldAccrued', data: { userId: 'user_001', yield: '0.05' } },
+    ];
+    for (const ev of events) {
+      if (this.redisService) {
+        this.redisService.redisPublisher.publish('ws:events', JSON.stringify({ ...ev, room: 'room:global', timestamp: Date.now() }));
+      }
+    }
   }
 }
